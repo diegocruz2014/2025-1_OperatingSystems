@@ -79,6 +79,89 @@ int fifo(const vector<int>& pages, int frames) {
     return pageFaults;
 }
 
+// Algoritmo óptimo
+int optimal(const vector<int>& pages, int frames) {
+    vector<int> memory; // lista de páginas en memoria.
+    int pagesFaults = 0; // Contador de fallos de página.
+
+    // LLevar a cabo el proceso de simulación con cada página
+    for (size_t i = 0; i < pages.size(); i++) {
+        // Buscar la página en memoria. Si la página no está en memoria, se produce
+        // un fallo de pàgina
+        if (find(memory.begin(), memory.end(), pages[i]) == memory.end()) {
+            pagesFaults++;
+            // Verificar si la memoria está llena
+            if (memory.size() == frames) {
+                // Las siguientes acciones se realizan si el contenedor memory está lleno
+                // Se busca la página que se utilizará el futuro y será reemplazada.
+                // farthest: Inicialmente a este elemento se le asigna inicialmente el
+                // valor de i y servirá para determinar la referencia más lejana en el futuro.
+                // replaceIndex: Se inicia en -1 y almacenará el índice en memory de la página a
+                // reemplazar si se encuentra en un futuro. Si no se encuentra en un futuro, será
+                // la referencia al último elemento en memory.
+                int farthest = i, replaceIndex = -1;
+                // Con el siguiente ciclo se recorre cada página cargada en memory
+                for (size_t j = 0; j < memory.size(); j++) {
+                    size_t k;
+                    // Con el siguiente ciclo se busca la próxima referencia de la página actual
+                    for (k = i + 1; k < pages.size(); k++) {
+                        if (memory[j] == pages[k]) break;
+                    }
+                    if (k > farthest) {
+                        // Determinar la página más lejana en el futuro
+                        farthest = k; // Se actualiza farthest
+                        replaceIndex = j; // Se actualiza replaceIndex
+                    }
+                }
+                // Reemplazar la página seleccionada
+                memory[replaceIndex] = pages[i];
+            }
+                // Si todavía hay espacio en memory (la memoria aún no está llena), simplemente se
+                // añade la nueva página al final de la lista memory.
+            else {
+                memory.push_back(pages[i]);
+            }
+        }
+        // Mostrar el estado actual del caché
+        cout << "Estado actual de la memoria caché: ";
+        for (int p: memory) cout << p << " ";
+        cout << "| Fallos: " << pagesFaults << endl;
+    }
+    return pagesFaults;
+}
+
+// Algoritmo Reloj
+int clock(const vector<int>& pages, int frames) {
+    vector<int> memory(frames, -1);
+    vector<bool> refBit(frames, false);
+    int pagefaults = 0, pointer = 0;
+
+    // Simulación para cada página
+    for (int page : pages) {
+        auto it = find(memory.begin(), memory.end(), page);
+        if (it == memory.end()) {
+            pagefaults++;
+            while (refBit[pointer]) {
+                refBit[pointer] = false;
+                pointer = (pointer + 1) % frames;
+            }
+            memory[pointer] = page;
+            refBit[pointer] = true;
+            pointer = (pointer + 1) % frames;
+        }
+        else {
+            refBit[it - memory.begin()] = true;
+        }
+        // Mostrar el estado actual de la memoria caché
+        cout << "Estado actual de la memoria caché: ";
+        for (int p : memory) {
+            if (p != -1) cout << p;
+            cout << " ";
+        }
+        cout << "| fallos: " << pagefaults << endl;
+    }
+    return pagefaults;
+}
 
 // Función principal
 int main() {
@@ -107,9 +190,17 @@ int main() {
     cout << "\nAlgoritmo FIFO: " << endl;
     f2 = fifo(pages, frames);
 
+    cout << "\nAlgoritmo Óptimo: " << endl;
+    f3 = optimal(pages, frames);
+
+    cout << "\nAlgoritmo Reloj: " << endl;
+    f4 = clock(pages, frames);
+
     cout << "\nCantidad de fallos de página en cada algoritmo: " << endl;
     cout << "LRU: " << f1 << endl;
     cout << "FIFO: " << f2 << endl;
+    cout << "Optimal: " << f3 << endl;
+    cout << "Clock: " << f4 << endl;
     return 0;
 }
 
