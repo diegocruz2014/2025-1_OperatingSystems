@@ -1,0 +1,3 @@
+D:/C++Projects/07_SincronizacionCenaFilosofos/cmake-build-debug/CMakeFiles/07_SincronizacionCenaFilosofos.dir
+D:/C++Projects/07_SincronizacionCenaFilosofos/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/C++Projects/07_SincronizacionCenaFilosofos/cmake-build-debug/CMakeFiles/rebuild_cache.dir
