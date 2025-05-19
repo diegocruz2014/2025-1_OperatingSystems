@@ -4,6 +4,8 @@
 
 using namespace std;
 
+// Planificación de procesos: Algoritmo FCFS (First Come First Served)
+
 // Estructura para representar un proceso
 struct Process {
     string id;
